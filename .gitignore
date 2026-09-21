@@ -1,0 +1,10 @@
+# Private health, financial, and identity records
+records/private/
+.env
+*.key
+*.pem
+
+# Local environment
+.venv/
+__pycache__/
+.DS_Store
