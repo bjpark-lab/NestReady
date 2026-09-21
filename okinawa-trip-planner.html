@@ -99,6 +99,29 @@
     button:focus-visible, a:focus-visible { outline: 3px solid var(--sand); outline-offset: 3px; }
     @media (max-width: 680px) { .wrap { width: min(100% - 24px, 1060px); } header { padding-top: 34px; } .stats { grid-template-columns: repeat(2, 1fr); } .item { grid-template-columns: 66px 1fr; gap: 9px; padding-left: 15px; } .desc { margin-left: 0; } .bottom-grid { grid-template-columns: 1fr; } .card { padding: 13px; } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
+    .global-tools, .day-tools, .place-tools { display: flex; flex-wrap: wrap; gap: 8px; }
+    .global-tools { margin: 16px 0 6px; }
+    .utility-btn, .place-link, .detail-toggle { min-height: 38px; padding: 7px 11px; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 8px; cursor: pointer; font-size: .82rem; font-weight: 700; text-decoration: none; }
+    .utility-btn:hover, .place-link:hover, .detail-toggle:hover { border-color: var(--ocean); color: var(--deep-ocean); }
+    .utility-btn.active { color: #fff; background: var(--ocean); border-color: var(--ocean); }
+    .route { margin: 14px 0 20px; overflow: hidden; background: var(--card); border: 1px solid var(--line); border-radius: 13px; box-shadow: var(--shadow); }
+    .route-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 11px 14px; color: var(--muted); background: rgba(22,123,140,.06); font-size: .79rem; font-weight: 700; }
+    .route iframe { display: block; width: 100%; height: 280px; border: 0; }
+    .day-tools { margin: 0 0 12px; }
+    .place-tools { margin: 10px 0 0 32px; }
+    .details { display: none; margin: 11px 0 0 32px; padding: 11px 12px; color: var(--muted); background: rgba(22,123,140,.065); border-radius: 8px; font-size: .84rem; }
+    .details.open { display: block; }
+    .details p { margin: 0; }
+    .notice strong { color: var(--deep-ocean); }
+    html[data-view="mobile"] { font-size: 15px; }
+    html[data-view="mobile"] .wrap { width: min(430px, calc(100% - 24px)); }
+    html[data-view="mobile"] header { padding-top: 28px; }
+    html[data-view="mobile"] .stats { grid-template-columns: repeat(2, 1fr); }
+    html[data-view="mobile"] .item { grid-template-columns: 1fr; gap: 5px; padding-left: 15px; }
+    html[data-view="mobile"] .time { padding: 0; font-size: .78rem; }
+    html[data-view="mobile"] .desc, html[data-view="mobile"] .place-tools, html[data-view="mobile"] .details { margin-left: 0; }
+    html[data-view="mobile"] .route iframe { height: 210px; }
+    @media print { header { padding: 20px 0 8px; background: none !important; color: #000; } .theme-buttons, .global-tools, .tabs, .day-tools, .place-tools, .detail-toggle, .bottom-grid, .notice { display: none !important; } .day { display: block !important; break-after: page; padding: 16px 0; } .day:not(.active) { display: block !important; } .route iframe { display: none; } .route { box-shadow: none; } body { background: #fff; color: #000; } .card { box-shadow: none; } }
   </style>
 </head>
 <body>
@@ -127,6 +150,11 @@
         <button type="button" data-theme-choice="light">☀ 밝게</button>
         <button type="button" data-theme-choice="dark">☾ 어둡게</button>
       </div>
+    </div>
+    <div class="global-tools" aria-label="일정 도구">
+      <button type="button" class="utility-btn" data-view-choice="desktop">🖥 PC 보기</button>
+      <button type="button" class="utility-btn" data-view-choice="mobile">📱 모바일 보기</button>
+      <button type="button" class="utility-btn" id="print-plan">전체 일정 인쇄 / PDF</button>
     </div>
     <nav class="tabs" role="tablist" aria-label="여행 일자"></nav>
     <section id="days"></section>
@@ -158,6 +186,19 @@
   <footer><div class="wrap">마지막 갱신: 2026-09-21 · 상세 근거와 예약 전 체크리스트는 NestReady 프로젝트 문서를 기준으로 관리합니다. 이 공개 일정에는 예약번호, 여권·결제 정보, 의료 기록을 포함하지 않습니다.</div></footer>
 
   <script>
+    const PLACES = {
+      '인천공항 → 나하공항': { label: '나하공항', japanese: '那覇空港', query: 'Naha Airport Okinawa Japan', detail: '도착 공항입니다. 항공편 확정 뒤 실제 터미널과 공항 이동 수단을 다시 확인합니다.' },
+      '나하 숙소 체크인': { label: '국제거리', japanese: '国際通り', query: 'Kokusai-dori Street Naha Okinawa', detail: '나하 시내의 1.6km 거리입니다. 숙소가 미정이므로 관광 목적의 장거리 보행 대신 숙소 가까운 구간만 선택합니다.' },
+      '온나손 → 츄라우미 수족관': { label: '오키나와 츄라우미 수족관', japanese: '沖縄美ら海水族館\n沖縄県国頭郡本部町石川424', query: 'Okinawa Churaumi Aquarium 424 Ishikawa Motobu Okinawa', detail: '공식 안내 주소는 오키나와현 구니가미군 모토부정 이시카와 424입니다. 운영시간·휴관일·주차는 방문일 기준으로 재확인합니다.' },
+      '만좌모 또는 근거리 전망·해안 산책': { label: '만좌모', japanese: '万座毛\n沖縄県国頭郡恩納村恩納2767', query: 'Cape Manzamo 2767 Onna Okinawa', detail: '온나손의 해안 전망지입니다. 바람·비가 있거나 컨디션이 좋지 않으면 방문하지 않고 숙소에서 휴식합니다.' }
+    };
+    const ROUTES = [
+      ['도착 동선', 'Naha Airport to Kokusai-dori Street Naha Okinawa'],
+      ['리조트 이동', 'Naha Airport to Onna Village Okinawa'],
+      ['북부 이동', 'Onna Village to Okinawa Churaumi Aquarium'],
+      ['근거리 산책', 'Onna Village to Cape Manzamo Okinawa'],
+      ['귀국 동선', 'Onna Village to Naha Airport Okinawa']
+    ];
     const DAYS = [
       { date: '12/14 월', place: '나하', memo: '도착일은 이동과 휴식만. 항공 도착 시간이 늦으면 저녁 외출도 생략합니다.', items: [
         ['오전~이른 오후', '인천공항 → 나하공항', '직항 왕복을 전제로 한 이동. 이른 새벽 출발·심야 도착편은 우선 제외하고 통로 좌석을 확인합니다.', '항공 미확정'],
@@ -200,19 +241,29 @@
     let active = 0;
     const id = (day, item) => `d${day}-i${item}`;
     function count(day) { return DAYS[day].items.filter((_, i) => saved[id(day, i)]).length; }
+    function mapUrl(query) { return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`; }
+    function routeHTML(day) { const [label, query] = ROUTES[day]; return `<section class="route"><div class="route-head"><span>Google Maps · ${label}</span><a href="${mapUrl(query)}" target="_blank" rel="noopener">전체 화면으로 열기</a></div><iframe loading="lazy" title="Day ${day + 1} ${label} 지도" src="https://www.google.com/maps?output=embed&q=${encodeURIComponent(query)}"></iframe></section>`; }
+    function placeHTML(title, itemKey) { const place = PLACES[title]; if (!place) return ''; return `<div class="place-tools"><a class="place-link" href="${mapUrl(place.query)}" target="_blank" rel="noopener">Google Maps</a><button type="button" class="place-link" data-copy="${itemKey}">일본어 주소 복사</button><button type="button" class="detail-toggle" aria-expanded="false" data-detail="${itemKey}">상세 보기</button></div><div class="details" id="detail-${itemKey}"><p><strong>${place.label}</strong><br>${place.detail}</p></div>`; }
     function render() {
       tabs.innerHTML = DAYS.map((day, i) => `<button role="tab" id="tab-${i}" aria-controls="day-${i}" aria-selected="${i === active}" tabindex="${i === active ? 0 : -1}" data-tab="${i}">Day ${i + 1}<small>${count(i)}/${day.items.length}</small></button>`).join('');
-      days.innerHTML = DAYS.map((day, d) => `<section class="day ${d === active ? 'active' : ''}" id="day-${d}" role="tabpanel" aria-labelledby="tab-${d}"><div class="day-heading"><h3>Day ${d + 1} · ${day.date}</h3><span class="tag">${day.place}</span></div><p class="memo">${day.memo}</p><div class="timeline">${day.items.map((item, i) => { const done = !!saved[id(d, i)]; return `<article class="item ${done ? 'done' : ''}"><div class="time">${item[0]}</div><div class="card"><div class="card-top"><div class="check"><button type="button" role="checkbox" aria-checked="${done}" aria-label="${item[1]} 완료 표시" data-check="${d}:${i}"></button><span class="title">${item[1]}</span></div><span class="badge">${item[3]}</span></div><p class="desc">${item[2]}</p></div></article>`; }).join('')}</div></section>`).join('');
+      days.innerHTML = DAYS.map((day, d) => `<section class="day ${d === active ? 'active' : ''}" id="day-${d}" role="tabpanel" aria-labelledby="tab-${d}"><div class="day-heading"><h3>Day ${d + 1} · ${day.date}</h3><span class="tag">${day.place}</span></div><p class="memo">${day.memo}</p>${routeHTML(d)}<div class="day-tools"><button type="button" class="utility-btn" data-open-day="${d}">상세 모두 펼치기</button><button type="button" class="utility-btn" data-close-day="${d}">상세 모두 숨기기</button></div><div class="timeline">${day.items.map((item, i) => { const itemKey = id(d, i); const done = !!saved[itemKey]; return `<article class="item ${done ? 'done' : ''}"><div class="time">${item[0]}</div><div class="card"><div class="card-top"><div class="check"><button type="button" role="checkbox" aria-checked="${done}" aria-label="${item[1]} 완료 표시" data-check="${d}:${i}"></button><span class="title">${item[1]}</span></div><span class="badge">${item[3]}</span></div><p class="desc">${item[2]}</p>${placeHTML(item[1], itemKey)}</div></article>`; }).join('')}</div></section>`).join('');
       bind();
     }
     function bind() {
       document.querySelectorAll('[data-tab]').forEach(button => button.addEventListener('click', () => { active = Number(button.dataset.tab); render(); }));
       document.querySelectorAll('[data-check]').forEach(button => button.addEventListener('click', () => { const [d, i] = button.dataset.check.split(':').map(Number); const itemKey = id(d, i); saved[itemKey] = !saved[itemKey]; localStorage.setItem(key, JSON.stringify(saved)); render(); }));
+      document.querySelectorAll('[data-copy]').forEach(button => button.addEventListener('click', async () => { const [, day, item] = button.dataset.copy.match(/^d(\d+)-i(\d+)$/); const title = DAYS[Number(day)].items[Number(item)][1]; const place = PLACES[title]; await navigator.clipboard.writeText(place.japanese); button.textContent = '복사됨'; setTimeout(() => { button.textContent = '일본어 주소 복사'; }, 1200); }));
+      document.querySelectorAll('[data-detail]').forEach(button => button.addEventListener('click', () => { const detail = document.querySelector(`#detail-${button.dataset.detail}`); const open = detail.classList.toggle('open'); button.setAttribute('aria-expanded', open); button.textContent = open ? '상세 숨기기' : '상세 보기'; }));
+      document.querySelectorAll('[data-open-day], [data-close-day]').forEach(button => button.addEventListener('click', () => { const open = button.hasAttribute('data-open-day'); document.querySelectorAll(`#day-${active} .details`).forEach(detail => detail.classList.toggle('open', open)); document.querySelectorAll(`#day-${active} [data-detail]`).forEach(toggle => { toggle.setAttribute('aria-expanded', open); toggle.textContent = open ? '상세 숨기기' : '상세 보기'; }); }));
     }
     tabs.addEventListener('keydown', event => { if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return; event.preventDefault(); active = (active + (event.key === 'ArrowRight' ? 1 : DAYS.length - 1)) % DAYS.length; render(); document.querySelector(`[data-tab="${active}"]`).focus(); });
     document.querySelectorAll('[data-theme-choice]').forEach(button => button.addEventListener('click', () => { const value = button.dataset.themeChoice; const current = document.documentElement.dataset.theme; document.documentElement.dataset.theme = current === value ? '' : value; if (document.documentElement.dataset.theme) localStorage.setItem('nestready-okinawa-theme-v1', document.documentElement.dataset.theme); else localStorage.removeItem('nestready-okinawa-theme-v1'); updateThemeButtons(); }));
     function updateThemeButtons() { const current = document.documentElement.dataset.theme; document.querySelectorAll('[data-theme-choice]').forEach(button => button.classList.toggle('active', button.dataset.themeChoice === current)); }
     const storedTheme = localStorage.getItem('nestready-okinawa-theme-v1'); if (storedTheme) document.documentElement.dataset.theme = storedTheme; updateThemeButtons(); render();
+    document.querySelectorAll('[data-view-choice]').forEach(button => button.addEventListener('click', () => { const mobile = button.dataset.viewChoice === 'mobile'; document.documentElement.dataset.view = mobile ? 'mobile' : ''; localStorage.setItem('nestready-okinawa-view-v1', mobile ? 'mobile' : 'desktop'); updateViewButtons(); }));
+    function updateViewButtons() { const view = document.documentElement.dataset.view || 'desktop'; document.querySelectorAll('[data-view-choice]').forEach(button => button.classList.toggle('active', button.dataset.viewChoice === view)); }
+    if (localStorage.getItem('nestready-okinawa-view-v1') === 'mobile') document.documentElement.dataset.view = 'mobile'; updateViewButtons();
+    document.querySelector('#print-plan').addEventListener('click', () => window.print());
   </script>
 </body>
 </html>
