@@ -74,7 +74,11 @@
     .section-heading p { margin: 0; font-size: .86rem; color: var(--muted); }
 
     .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .card-link { display: block; color: inherit; text-decoration: none; }
     .card { min-height: 148px; padding: 22px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+    .card-link .card { transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease; }
+    .card-link:hover .card, .card-link:focus-visible .card { border-color: var(--green); box-shadow: var(--shadow); transform: translateY(-2px); }
+    .card-link:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; border-radius: var(--radius); }
     .card-top { display: flex; align-items: start; justify-content: space-between; gap: 14px; }
     .card h3 { margin: 0; font-size: 1.05rem; letter-spacing: -.02em; }
     .card p { margin: 17px 0 0; color: var(--muted); font-size: .93rem; }
@@ -142,22 +146,30 @@
         <p>공개 가능한 상태만 표시합니다.</p>
       </div>
       <div class="grid">
-        <article class="card">
-          <div class="card-top"><h3>진료·검사</h3><span class="badge waiting">확인 대기</span></div>
-          <p>다음 진료 후 의료진 안내에 따라 검사와 추적 일정을 확정합니다.</p>
-        </article>
-        <article class="card">
-          <div class="card-top"><h3>태교여행</h3><span class="badge progress">검토 중</span></div>
-          <p>진료 경과 확인 후 이동과 보험 조건을 기준으로 실행 가능 여부를 판단합니다.</p>
-        </article>
-        <article class="card">
-          <div class="card-top"><h3>산후조리</h3><span class="badge progress">비교 중</span></div>
-          <p>후보별 객실 가능 여부, 실계약가, 투어 결과를 비교하고 있습니다.</p>
-        </article>
-        <article class="card">
-          <div class="card-top"><h3>시기별 체크리스트</h3><span class="badge ready">정리 완료</span></div>
-          <p>임신 초기부터 출산·신생아 초기까지의 준비 항목을 내부 체크리스트로 관리합니다.</p>
-        </article>
+        <a class="card-link" href="진료-검사.html" aria-label="진료·검사 상세 페이지">
+          <article class="card">
+            <div class="card-top"><h3>진료·검사</h3><span class="badge waiting">확인 대기</span></div>
+            <p>다음 진료 후 의료진 안내에 따라 검사와 추적 일정을 확정합니다.</p>
+          </article>
+        </a>
+        <a class="card-link" href="태교여행.html" aria-label="태교여행 상세 페이지">
+          <article class="card">
+            <div class="card-top"><h3>태교여행</h3><span class="badge progress">검토 중</span></div>
+            <p>진료 경과 확인 후 이동과 보험 조건을 기준으로 실행 가능 여부를 판단합니다.</p>
+          </article>
+        </a>
+        <a class="card-link" href="산후조리.html" aria-label="산후조리 상세 페이지">
+          <article class="card">
+            <div class="card-top"><h3>산후조리</h3><span class="badge progress">비교 중</span></div>
+            <p>후보별 객실 가능 여부, 실계약가, 투어 결과를 비교하고 있습니다.</p>
+          </article>
+        </a>
+        <a class="card-link" href="시기별-체크리스트.html" aria-label="시기별 체크리스트 상세 페이지">
+          <article class="card">
+            <div class="card-top"><h3>시기별 체크리스트</h3><span class="badge ready">정리 완료</span></div>
+            <p>임신 초기부터 출산·신생아 초기까지의 준비 항목을 내부 체크리스트로 관리합니다.</p>
+          </article>
+        </a>
       </div>
     </section>
 
