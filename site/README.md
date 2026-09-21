@@ -2,8 +2,8 @@
 
 `site/` is the only directory published by the GitHub Pages workflow.
 
-## Public-data rule
+## Publication scope
 
-Only add redacted preparation status here. Do not copy records from `docs/` or `records/` into this directory. In particular, exclude dates, medical results, hospital information, personal contacts, reservation details, and prices.
+The dashboard and the project source repository are public. Detail pages may summarize and link to the project's records, schedules, candidate comparisons, and checklists.
 
-The canonical private planning documents remain in the repository's `docs/`, `checklists/`, and ignored `records/private/` paths.
+`records/private/` remains ignored and is not published.
