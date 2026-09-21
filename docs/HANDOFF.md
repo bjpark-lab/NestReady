@@ -24,13 +24,16 @@
   - `docs/임신중_여행_태교여행_정리.md`
   - `docs/동탄_산후조리원_추천_세션정리.md`
 - `checklists/임신_시기별_체크리스트.md`에 예정일 2027-05-22 기준의 임신 초기~출산·신생아 초기 체크리스트를 추가했다.
-- `site/`에 개인정보를 제외한 공개용 상태 대시보드와 GitHub Pages 배포 워크플로를 추가했다. 원격 저장소 연결과 Pages 활성화는 아직 필요하다.
+- `site/`에 개인정보를 제외한 공개용 상태 대시보드를 추가했고, GitHub Pages(`https://bjpark-lab.github.io/NestReady/`)로 배포가 활성화된 상태다.
 - 네이버지도에서 위대한탄생·노블아이·동탄제일프리미엄·더온의 실제 등록, 리뷰와 최신 노출 리뷰를 재확인하고 결과를 아래 문서에 기록했다.
   - `docs/동탄_산후조리원_4곳_네이버재검증_2026-09-21.md`
+- 위 4곳의 공식 홈페이지·카카오채널에서 가격표, 객실 등급별 시설, 보호자(남편) 규정, 신생아 케어 교대 체계를 추가로 확인해 같은 문서에 반영했다. 야간 신생아실의 실제 인력 수와 2027년 5월 실계약가는 온라인으로 확인되지 않아 상담이 필요하다.
+- `site/산후조리.html` 공개 대시보드를 위 비교 내용으로 갱신하고 커밋 `0a85440`(`docs: publish postpartum care comparison`)으로 GitHub Pages에 배포했다. 배포 URL(`https://bjpark-lab.github.io/NestReady/산후조리.html`)을 열어 반영을 확인했다.
 - 오키나와 태교여행 초안과 예약 전 체크리스트를 추가했다. 항공·숙소 가격, 가용성, 보험 상품은 아직 조사·확정하지 않았다.
 - 오키나와 공개 일정 웹앱을 별도 공개 저장소 `bjpark-lab/nestready-okinawa-trip`의 `gh-pages` 브랜치에 배포했다. URL: `https://bjpark-lab.github.io/nestready-okinawa-trip/`.
   - 공개 산출물은 `okinawa-trip-planner.html` 한 파일뿐이다. `docs/`, `records/`, 체크리스트와 원본 저장소는 배포하지 않는다.
-  - 이후 변경은 `scripts/deploy_okinawa_trip_planner.sh`로 배포한다.
+  - 일자별 Google Maps 경로, 장소별 지도·일본어 주소 복사·상세 패널, PC/모바일 보기 전환과 인쇄/PDF 기능을 추가했다. 로컬 브라우저로 지도 표시·상세 패널 토글·모바일 뷰·인쇄 레이아웃(4일 모두 표시)을 확인한 뒤 커밋 `12b4c25`로 원본 저장소에 반영하고, `scripts/deploy_okinawa_trip_planner.sh`로 `gh-pages`에 재배포(커밋 `1cf3fa2`)해 배포 URL에서 반영을 확인했다.
+  - 이후 변경도 같은 스크립트로 배포한다.
 
 ## Decisions
 - 프로젝트명은 `NestReady`다.
